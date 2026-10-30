@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test-azure-oidc:
     docker:
-      - image: cimg/azure:2024.01 # Imagen oficial de CircleCI con la Azure CLI preinstalada
+      - image: cimg/azure:2026.10.1
     steps:
       - checkout
       # Paso 1: Autenticación en Azure usando OIDC
