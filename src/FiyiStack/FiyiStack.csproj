@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove=".github\**" />
+    <Compile Remove="wwwroot\uploads\PruebaProvincia\**" />
+    <Content Remove=".github\**" />
+    <Content Remove="wwwroot\uploads\PruebaProvincia\**" />
+    <EmbeddedResource Remove=".github\**" />
+    <EmbeddedResource Remove="wwwroot\uploads\PruebaProvincia\**" />
+    <None Remove=".github\**" />
+    <None Remove="wwwroot\uploads\PruebaProvincia\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="DotNetEnv" Version="3.2.0" />
+    <PackageReference Include="IronPdf" Version="2026.10.3" />
+    <PackageReference Include="mercadopago-sdk" Version="2.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\CMS\RoleBack\DTOs\" />
+    <Folder Include="Areas\CMS\RoleMenuBack\DTOs\" />
+    <Folder Include="Areas\CMS\UserBack\DTOs\" />
+    <Folder Include="Areas\System\FailureBack\DTOs\" />
+    <Folder Include="Areas\System\ParameterBack\DTOs\" />
+    <Folder Include="Areas\System\ParameterBack\Services\" />
+    <Folder Include="Components\Pages\SystemPages\FailurePages\" />
+    <Folder Include="Components\Pages\SystemPages\ParameterPages\" />
+    <Folder Include="DatabaseBackups\" />
+    <Folder Include="wwwroot\downloads\" />
+    <Folder Include="wwwroot\js\System\" />
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".circleci\01-config.yml" />
+    <None Include=".circleci\09-config.yml" />
+    <None Include=".circleci\08-config.yml" />
+    <None Include=".circleci\07-config.yml" />
+    <None Include=".circleci\06-config.yml" />
+    <None Include=".circleci\05-config.yml" />
+    <None Include=".circleci\04-config.yml" />
+    <None Include=".circleci\03-config.yml" />
+    <None Include=".circleci\02-config.yml" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,199 @@
+﻿@page "/cms/cms/permissionspage"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+@using FiyiStack.Components.Shared.ComponentsForDashboard;
+
+<PageTitle>Permisos | FiyiStack</PageTitle>
+
+<_SideNav ListFolderAndPagesForCMSDTO="ListFoldersAndPages"></_SideNav>
+
+<div class="main-content position-relative max-height-vh-100 h-100">
+    <_NavBar PageName="Permisos"></_NavBar>
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-300 border-radius-xl mt-4"
+             style="background-image: url('img/System/Landscape.jpg');">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+        </div>
+        <div class="card card-body mx-3 mx-md-4 mt-n6">
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mt-4 mb-2">
+                        Permisos
+                    </h4>
+                    <NavLink href="/panel-de-control"
+                             class="btn btn-outline-dark">
+                        <i class="fas fa-chevron-left"></i>
+                        Volver
+                    </NavLink>
+                    <hr />
+                    <p>Selecciona un rol</p>
+                    @if (ListAllRole != null)
+                    {
+                        @foreach (Role role in ListAllRole)
+                        {
+                            <button class="btn btn-dark mx-2"
+                                    @onclick="() => ChooseRole(role.RoleId)">
+                                @role.Name
+                            </button>
+                        }
+                    }
+                    <hr />
+                    @if (ListMenu != null)
+                    {
+                        @if (ListMenu.Count != 0)
+                        {
+                            @foreach (Menu Menu in ListMenu)
+                            {
+                                if (Menu.IsAvailableForUser)
+                                {
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               checked
+                                               @onchange="() => Submit(Menu.MenuId, Menu.IsAvailableForUser)"
+                                               id="@Menu.Name">
+                                            <label class="form-check-label"
+                                                for="@Menu.Name">
+                                                @Menu.Name
+                                            </label>
+                                        </div>
+                                }
+                                else
+                                {
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                                type="checkbox"
+                                                @onchange="() => Submit(Menu.MenuId, Menu.IsAvailableForUser)"
+                                                id="@Menu.Name">
+                                            <label class="form-check-label"
+                                                for="@Menu.Name">
+                                                @Menu.Name
+                                            </label>
+                                    </div>
+                                }
+                            }
+                        }
+                    }
+                    <hr />
+                </div>
+            </div>
+        </div>
+    </div>
+    <_Footer></_Footer>
+</div>
+
+@code{
+    #region Properties
+    public new User User { get; set; } = new();
+
+    public long ChosenRole { get; set; }
+
+    public List<Menu>? ListMenu { get; set; }
+
+    public List<Menu>? ListAllMenuByRoleId { get; set; }
+
+    public List<FolderAndPagesForCMSDTO> ListFoldersAndPages = new();
+
+    public List<Role>? ListAllRole { get; set; }
+    #endregion
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                await base.IsUserAvailableToUseThisPage("/cms/cms/permissionspage");
+
+                User = base.User!;
+
+                List<Menu> ListMenu = await menuRepository
+                                            .GetAllAsync();
+
+                ListAllMenuByRoleId = await rolemenuRepository
+                                            .GetAllByRoleIdAsync(User!.RoleId, ListMenu);
+
+                ListFoldersAndPages = await rolemenuRepository
+                                            .GetAllPagesAndFoldersForCMSByRoleIdAsync(User.RoleId);
+
+                ListAllRole = await roleRepository
+                                .GetAllAsync();
+
+                ListMenu = [];
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", NotificationTypeForJs.Error);
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ChooseRole(long chosenRoleId)
+    {
+        try
+        {
+            List<Menu> ListAllMenu = await menuRepository
+                .GetAllAsync();
+
+            ListMenu = await rolemenuRepository
+                .GetAllWithStateByRoleIdAsync(chosenRoleId, ListAllMenu);
+
+            ChosenRole = chosenRoleId;
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", NotificationTypeForJs.Error);
+        }
+    }
+
+    private async Task Submit(long menuId, bool isSelected)
+    {
+        try
+        {
+            //Delete by MenuId and RoleId
+            await rolemenuRepository
+                    .DeleteByMenuIdAndRoleIdAsync(ChosenRole, menuId);
+
+            if (!isSelected)
+            {
+                RoleMenu rolemenu = new()
+                    {
+                        DateTimeCreation = DateTime.Now,
+                        DateTimeLastModification = DateTime.Now,
+                        RoleMenuId = 0,
+                        UserCreationId = User.UserId,
+                        UserLastModificationId = User.UserId,
+                        Active = true,
+                        MenuId = menuId,
+                        RoleId = ChosenRole,
+                    };
+
+                await rolemenuRepository
+                        .AddAsync(rolemenu);
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", NotificationTypeForJs.Error);
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

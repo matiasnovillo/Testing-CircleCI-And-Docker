@@ -1,0 +1,152 @@
+﻿@page "/panel-de-control"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+
+@using FiyiStack.Components.Shared.ComponentsForDashboard;
+
+<PageTitle>Panel de control | FiyiStack</PageTitle>
+
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<_SideNav ListFolderAndPagesForCMSDTO="lstFoldersAndPages"></_SideNav>
+
+<main class="main-content border-radius-lg ">
+
+    <_NavBar PageName="Panel de control"></_NavBar>
+
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-200 border-radius-xl mt-4 bg-gradient-dark">
+        </div>
+        @if (User!.UserId == 0)
+        {
+            // Si no se ha cargado el usuario, mostramos un skeleton o spinner de carga
+        }
+        else
+        {
+            <div class="card card-body mx-3 mx-md-4 mt-n6">
+                <div class="row gx-4 mb-2">
+                    <div class="col-auto">
+                        <div class="avatar avatar-xl position-relative ml-3">
+                            <img src="img/cms/User.png"
+                                 alt="profile_image"
+                                 class="avatar avatar-xl shadow-lg">
+                        </div>
+                    </div>
+                    <div class="col-auto my-auto">
+                        <div class="h-100">
+                            <h4 class="mb-1">
+                                @User.Email
+                            </h4>
+                            <p class="mb-0 font-weight-normal text-sm">
+                                Usuario
+                            </p>
+                        </div>
+                        <hr />
+                    </div>
+                    <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                        &nbsp;
+                    </div>
+                </div>
+                @if (User!.RoleId == 1) // Solo mostramos esta sección si el usuario es admin
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mt-4 mb-4">
+                                Páginas
+                            </h4>
+                            @if (lstFoldersAndPages != null)
+                            {
+                                @foreach (FolderAndPagesForCMSDTO folderandpages in lstFoldersAndPages)
+                                {
+                                    <h6 class="mt-4">
+                                        <i class="fas fa-folder"></i>&nbsp;
+                                        @folderandpages.Folder.Name
+                                    </h6>
+                                    foreach (Menu Menu in folderandpages.Pages)
+                                    {
+                                        <a class="btn btn-dark mx-1 my-1"
+                                               href="@Menu.URLPath">
+                                            <i class="fas fa-file"></i>&nbsp;
+                                            @Menu.Name
+                                        </a>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card  mb-2">
+                                <div class="card-header p-2 ps-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <p class="text-sm mb-0 text-capitalize">
+                                                Proyectos
+                                            </p>
+                                            <h4 class="mb-0">
+                                                @NumberOfProjects
+                                            </h4>
+                                            <NavLink href="/proyecto/crear"
+                                            class="btn btn-outline-dark mt-2">
+                                                <i class="fas fa-plus"></i>
+                                                Crear proyecto
+                                            </NavLink>
+                                            <NavLink href="/proyecto/lista"
+                                                     class="btn btn-outline-dark mt-2">
+                                                <i class="fas fa-list"></i>
+                                                Listar proyectos
+                                            </NavLink>
+                                        </div>
+                                        <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-lg">
+                                            <i class="fas fa-diagram-project"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</main>
+
+<_Footer></_Footer>
+
+@code {
+    public new User? User { get; set; } = new();
+
+    public int NumberOfProjects { get; set; } = 0;
+
+    public List<FolderAndPagesForCMSDTO> lstFoldersAndPages = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                User = base.User;
+
+                lstFoldersAndPages = await rolemenuRepository
+                                .GetAllPagesAndFoldersForCMSByRoleIdAsync(User!.RoleId);
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", NotificationTypeForJs.Error);
+        }
+    }
+}

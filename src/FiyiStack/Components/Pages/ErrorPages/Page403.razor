@@ -1,0 +1,61 @@
+﻿@page "/403"
+
+<PageTitle>403 | FiyiStack</PageTitle>
+
+<FiyiStack.Components.Shared.ComponentsForHome._NavBar></FiyiStack.Components.Shared.ComponentsForHome._NavBar>
+
+<div class="page-header align-items-start min-vh-100"
+     style="background-image: url('../../assets/img/2-island.png');"
+     loading="lazy">
+    <span class="mask bg-gradient-dark opacity-6"></span>
+    <div class="container my-auto">
+        <div class="row">
+            <div class="col-lg-12 m-auto text-center">
+                <h1 class="display-1 text-white">
+                    403
+                </h1>
+                <h3 class="text-white">
+                    No tienes acceso a esta página
+                </h3>
+                <NavLink class="btn bg-gradient-warning mt-4"
+                href="/">
+                    <i class="fas fa-home"></i>
+                    Inicio
+                </NavLink>
+            </div>
+        </div>
+    </div>
+</div>
+
+<FiyiStack.Components.Shared.ComponentsForHome._Footer></FiyiStack.Components.Shared.ComponentsForHome._Footer>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            Failure failure = new()
+                {
+                    Active = true,
+                    DateTimeCreation = DateTime.Now,
+                    DateTimeLastModification = DateTime.Now,
+                    UserCreationId = 1,
+                    UserLastModificationId = 1,
+                    EmergencyLevel = 1,
+                    Comment = "",
+                    Message = ex.Message,
+                    Source = ex.Source,
+                    StackTrace = ex.StackTrace
+                };
+
+            await failureRepository.AddAsync(failure);
+        }
+    }
+}

@@ -1,0 +1,531 @@
+﻿@page "/cms/system/failurenonquerypage/{FailureId:int}"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+@using FiyiStack.Areas.System.FailureBack.Repositories;
+@using FiyiStack.Areas.System.FailureBack.Entities;
+@using FiyiStack.Areas.System.FailureBack.DTOs;
+
+@inject FailureRepository failureRepository;
+@inject IJSRuntime IJSRuntime;
+
+<!--FOREIGN CALLS (TABLES)-->
+
+
+@if (FailureId == 0)
+{
+    <PageTitle>Agregar failure - System</PageTitle>
+}
+else
+{
+    <PageTitle>Editar failure - System</PageTitle>
+}
+
+<FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard lstFoldersAndPagesForSideNavDTO="ListFoldersAndPagesForSideNavDTO"></FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard>
+
+<div class="main-content position-relative max-height-vh-100 h-100">
+    <FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard Pagina="Failure"></FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard>
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-300 border-radius-xl mt-4"
+             style="background-image: url('img/System/Landscape.jpg');">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+        </div>
+        <div class="card card-body mx-3 mx-md-4 mt-n6">
+            <div class="card-header mb-0 pb-0 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <h3 class="mb-3 mb-md-0">
+                        @if (FailureId == 0)
+                        {
+                            <span>Agregar failure</span>
+                        }
+                        else
+                        {
+                            <span>Editar failure</span>
+                        }
+                    </h3>
+                    <div class="d-flex">
+                        <NavLink class="btn btn-white btn-sm" href="CMS/System/FailureQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;
+                            Volver
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="alert alert-info text-white" role="alert">
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                </div>
+                <hr class="mt-3" />
+            </div>
+            <div class="card-body px-4">
+                <form method="post" @onsubmit="Submit"
+                      @formname="failure-form" class="mb-4">
+                    <AntiforgeryToken />
+                    <!--Message-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="message">
+                            Message
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageMessage != "")
+                            {
+                                @((MarkupString)ErrorMessageMessage)
+                            }
+                        </label>
+                        <textarea rows="10"
+                        class="form-control pt-0"
+                        value="@Failure!.Message"
+                        @onchange="HandleMessageChange"
+                        id="message">
+                        </textarea>
+                    </div>
+                    <!--EmergencyLevel-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="emergencylevel">
+                            EmergencyLevel
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageEmergencyLevel != "")
+                            {
+                                @((MarkupString)ErrorMessageEmergencyLevel)
+                            }
+                        </label>
+                        <input type="number"
+                        step="1" 
+                        id="emergencylevel"
+                        class="form-control pt-0"
+                        value="@Failure!.EmergencyLevel"
+                        @onchange="HandleEmergencyLevelChange" />
+                    </div>
+                    <!--StackTrace-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="stacktrace">
+                            StackTrace
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageStackTrace != "")
+                            {
+                                @((MarkupString)ErrorMessageStackTrace)
+                            }
+                        </label>
+                        <textarea rows="10"
+                        class="form-control pt-0"
+                        value="@Failure!.StackTrace"
+                        @onchange="HandleStackTraceChange"
+                        id="stacktrace">
+                        </textarea>
+                    </div>
+                    <!--Source-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="source">
+                            Source
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageSource != "")
+                            {
+                                @((MarkupString)ErrorMessageSource)
+                            }
+                        </label>
+                        <textarea rows="10"
+                        class="form-control pt-0"
+                        value="@Failure!.Source"
+                        @onchange="HandleSourceChange"
+                        id="source">
+                        </textarea>
+                    </div>
+                    <!--Comment-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="comment">
+                            Comment
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageComment != "")
+                            {
+                                @((MarkupString)ErrorMessageComment)
+                            }
+                        </label>
+                        <textarea rows="10"
+                        class="form-control pt-0"
+                        value="@Failure!.Comment"
+                        @onchange="HandleCommentChange"
+                        id="comment">
+                        </textarea>
+                    </div>
+                    
+                    <hr />
+                    @((MarkupString)Message)
+                    <div class="d-flex justify-content-between">
+                        <button id="btn-submit" 
+                        type="submit"
+                        class="btn btn-success"
+                        disabled="@IsSubmitting">
+                            @if (IsSubmitting)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>&nbsp;Guardando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-pen"></i>
+                                <span>&nbsp;@(FailureId == 0 ? "Agregar" : "Editar")</span>
+                            }
+                        </button>
+                        <NavLink class="btn btn-white mx-3" href="CMS/System/FailureQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;Volver
+                        </NavLink>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    
+
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard>
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard>
+</div>
+
+@code {
+
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+
+    #region Properties
+    private List<FolderAndPagesForCMSDTO> ListFoldersAndPagesForSideNavDTO = [];
+
+    [Parameter]
+    public int FailureId { get; set; }
+
+    private string Message { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    private Failure Failure { get; set; } = new();
+
+    private bool IsSubmitting = false;
+
+    //Error messages for inputs
+    private string ErrorMessageFailureId { get; set; } = "";
+    private string ErrorMessageDateTimeCreation { get; set; } = "";
+    private string ErrorMessageDateTimeLastModification { get; set; } = "";
+    private string ErrorMessageUserCreationId { get; set; } = "";
+    private string ErrorMessageUserLastModificationId { get; set; } = "";
+    private string ErrorMessageActive { get; set; } = "";
+    private string ErrorMessageMessage { get; set; } = "";
+    private string ErrorMessageEmergencyLevel { get; set; } = "";
+    private string ErrorMessageStackTrace { get; set; } = "";
+    private string ErrorMessageSource { get; set; } = "";
+    private string ErrorMessageComment { get; set; } = "";
+    
+    
+    //FOREIGN LISTS (TABLES)
+    
+
+    //CANCELATION TOKENS
+    
+    #endregion
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                await base.IsUserAvailableToUseThisPage("/CMS/System/Failurequerypage");
+
+                ListFoldersAndPagesForSideNavDTO = await rolemenuRepository
+                    .GetAllPagesAndFoldersForCMSByRoleIdAsync(base.User!.RoleId);
+
+                //FOREIGN LISTS (TABLES)
+                
+
+                if (FailureId == 0)
+                {
+                    //Create new Failure
+                    Failure = new();
+                }
+                else
+                {
+                    //Edit Failure
+
+                    Failure = await failureRepository
+                                .GetOneByFailureIdAsync(FailureId);
+
+                    
+                }  
+
+
+                Check("");
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (IsSubmitting)
+            {
+                return;
+            }
+
+            IsSubmitting = true;
+            await InvokeAsync(StateHasChanged);
+
+            if(Check("") != null)
+            {
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Atención", "No se puede guardar. Hay campos faltantes. Operación cancelada.", "warning");
+                return;
+            }
+
+            if (FailureId == 0)
+            {
+                //Create new Failure
+                Failure.Active = true;
+                Failure.UserCreationId = User.UserId;
+                Failure.UserLastModificationId = User.UserId;
+                Failure.DateTimeCreation = DateTime.Now;
+                Failure.DateTimeLastModification = DateTime.Now;
+
+                await failureRepository
+                    .AddAsync(Failure);
+  
+            }
+            else
+            {
+                //Update data
+                Failure.DateTimeLastModification = DateTime.Now;
+                Failure.UserLastModificationId = User.UserId;
+
+                await failureRepository
+                    .UpdateAsync(Failure);
+            }
+            
+            NavigationManager.NavigateTo("/cms/system/failurequerypage");
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            //Re-render the page
+            IsSubmitting = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+
+    #region Uploaders
+    
+    #endregion   
+
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+
+    #region SEARCHERS FOR FOREIGN TABLES
+    
+    #endregion
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="attributeToValid">Debe estar encapsulado en []. Ejemplo: [Boolean]</param>
+    /// <returns></returns>
+    private ValidationResult Check(string attributeToValid)
+    {
+        try
+        {
+            List<ValidationResult> lstValidationResult = new List<ValidationResult>();
+            ValidationContext ValidationContext = new ValidationContext(Failure);
+
+            bool IsValid = Validator.TryValidateObject(Failure, ValidationContext, lstValidationResult, true);
+
+            ValidationResult ValidationResult = lstValidationResult
+            .AsQueryable()
+            .FirstOrDefault(x => x.ErrorMessage.StartsWith(attributeToValid));
+
+            if (!IsValid)
+            {
+                Message = $@"<div class=""alert alert-warning text-white"" role=""alert"">
+                                Para guardar correctamente debe completar los siguientes puntos: <br/> <ul>";
+
+                foreach (var validationResult in lstValidationResult)
+                {
+                    validationResult.ErrorMessage = validationResult.ErrorMessage.Substring(validationResult.ErrorMessage.IndexOf(']') + 1);
+                    Message += $@"<li>{validationResult}</li>";
+                }
+
+                Message = Message + "</ul></div>";
+            }
+            else
+            {
+                Message = $@"<div class=""alert alert-successs text-white"" role=""alert"">
+                                Todos los datos ingresados son correctos
+                            </div>";
+            }
+
+
+            if (ValidationResult != null)
+            {
+                ValidationResult.ErrorMessage = ValidationResult.ErrorMessage.Substring(ValidationResult.ErrorMessage.IndexOf(']') + 1);
+            }
+
+            return ValidationResult;
+        }
+        catch (Exception ex)
+        {
+            base.CatchException(ex);
+
+            return null;
+        }
+        finally
+        {
+
+        }
+    }
+
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+
+    #region Handlers
+    private async Task HandleMessageChange(ChangeEventArgs e)
+    {
+        Failure.Message = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Message]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageMessage = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageMessage = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleEmergencyLevelChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            Failure.EmergencyLevel = result;
+        }
+        else
+        {
+            Failure.EmergencyLevel = 0;
+        }
+
+        ValidationResult ValidationResult = Check("[EmergencyLevel]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageEmergencyLevel = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageEmergencyLevel = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleStackTraceChange(ChangeEventArgs e)
+    {
+        Failure.StackTrace = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[StackTrace]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageStackTrace = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageStackTrace = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleSourceChange(ChangeEventArgs e)
+    {
+        Failure.Source = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Source]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageSource = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageSource = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleCommentChange(ChangeEventArgs e)
+    {
+        Failure.Comment = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Comment]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageComment = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageComment = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    #endregion
+}

@@ -1,0 +1,39 @@
+services:
+  fiyistack-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MS_SQL_SERVER_PASSWORD}"
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql/data
+    env_file:
+      - .env
+  fiyistack:
+    build: .
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    volumes:
+      - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ENV}"
+      ConnectionStrings__DefaultConnection: 'Server=fiyistack-db;Database="${MS_SQL_SERVER_DB_NAME}";User Id="${MS_SQL_SERVER_USER}";Password="${MS_SQL_SERVER_PASSWORD}";TrustServerCertificate=True;'
+    depends_on:
+      - fiyistack-db
+    restart: unless-stopped
+volumes:
+  dataprotection-keys:
+  sql_data:

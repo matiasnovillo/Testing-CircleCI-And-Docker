@@ -1,0 +1,234 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\.env||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:.env||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\docker-compose.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:docker-compose.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\components\\pages\\cmspages\\menupages\\menunonquerypage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:components\\pages\\cmspages\\menupages\\menunonquerypage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\databasecontexts\\fiyistackdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:databasecontexts\\fiyistackdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\controllers\\healthvaluescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:controllers\\healthvaluescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|c:\\fiyistack\\courses\\devops-mundose\\mi proyecto\\ci-cd-with-circle-ci\\fiyistack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{992EB409-1B5C-47BF-ABC6-DE9EFE5E68E1}|FiyiStack.csproj|solutionrelative:fiyistack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 10,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:136:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": ".env",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\.env",
+              "RelativeDocumentMoniker": ".env",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\.env",
+              "RelativeToolTip": ".env",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-10-29T14:36:07.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\docker-compose.yml",
+              "RelativeDocumentMoniker": "docker-compose.yml",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\docker-compose.yml",
+              "RelativeToolTip": "docker-compose.yml",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAACAAAADGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2026-10-29T14:35:45.241Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MenuNonQueryPage.razor",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Components\\Pages\\CMSPages\\MenuPages\\MenuNonQueryPage.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\CMSPages\\MenuPages\\MenuNonQueryPage.razor",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Components\\Pages\\CMSPages\\MenuPages\\MenuNonQueryPage.razor",
+              "RelativeToolTip": "Components\\Pages\\CMSPages\\MenuPages\\MenuNonQueryPage.razor",
+              "ViewState": "AgIAAPwAAAAAAAAAAAAAABIBAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-28T03:03:51.582Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FiyiStackDbContext.cs",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\DatabaseContexts\\FiyiStackDbContext.cs",
+              "RelativeDocumentMoniker": "DatabaseContexts\\FiyiStackDbContext.cs",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\DatabaseContexts\\FiyiStackDbContext.cs",
+              "RelativeToolTip": "DatabaseContexts\\FiyiStackDbContext.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-28T03:03:06.044Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-10-28T02:56:22.66Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-10-28T02:56:02.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAAAHIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-24T18:57:05.961Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "FiyiStack.csproj",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\FiyiStack.csproj",
+              "RelativeDocumentMoniker": "FiyiStack.csproj",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\FiyiStack.csproj",
+              "RelativeToolTip": "FiyiStack.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-10-24T18:32:55.625Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "HealthValuesController.cs",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Controllers\\HealthValuesController.cs",
+              "RelativeDocumentMoniker": "Controllers\\HealthValuesController.cs",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Controllers\\HealthValuesController.cs",
+              "RelativeToolTip": "Controllers\\HealthValuesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-24T17:57:22.596Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Home.razor",
+              "DocumentMoniker": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Components\\Pages\\Home.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Home.razor",
+              "ToolTip": "C:\\FiyiStack\\Courses\\DevOps-MundosE\\MI PROYECTO\\CI-CD-With-Circle-CI\\Components\\Pages\\Home.razor",
+              "RelativeToolTip": "Components\\Pages\\Home.razor",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAADYAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-24T17:28:23.081Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1075,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

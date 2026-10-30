@@ -1,0 +1,70 @@
+﻿@page "/"
+
+@using FiyiStack.Areas.CMS.UserBack.Repositories;
+@inject UserRepository userRepository;
+@using FiyiStack.Components.Shared.ComponentsForHome;
+
+<PageTitle>Home | FiyiStack</PageTitle>
+
+@* <HeadContent>
+    <meta name="description" content="Hola! Bienvenido a mi sitio web">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Bienvenido al portafolio de Matias Novillo" />
+    <meta property="og:description" content="Experimentado programador buscando nuevas ofertas laborales" />
+    <meta property="og:image" content="https://fiyistack.com/img/seo/home.png" />
+    <meta property="og:url" content="https://fiyistack.com/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bienvenido al portafolio de Matias Novillo" />
+    <meta name="twitter:description" content="Experimentado programador buscando nuevas ofertas laborales" />
+    <meta name="twitter:image" content="https://fiyistack.com/img/seo/home.png" />
+</HeadContent> *@
+
+@* <_NavBar></_NavBar> *@
+
+<header>
+    <div class="page-header min-vh-100 bg-gradient-info">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 my-auto">
+                    <div class="brand">
+                        <h1 class="text-white mb-2">FiyiStack</h1>
+                    </div>
+                </div>
+                <div class="col-lg-6 ms-auto">
+                    @* <img src="../../assets/img/iphones.png" class="w-70 z-index-2 ms-5" loading="lazy"> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+@* <_Footer></_Footer> *@
+
+@code{
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Solo ejecutamos la lógica de la base de datos la primera vez que se carga el componente
+        if (firstRender)
+        {
+            try
+            {
+                int CantidadDeUsuarios = await userRepository.CountAsync();
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Exito", $@"Cantidad de usuarios: {CantidadDeUsuarios}", "success");
+            }
+            catch (Exception ex)
+            {
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", ex.Message, "error");
+            }
+            finally
+            {
+                // Opcional: Solo si necesitas repintar la pantalla tras el proceso asíncrono
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+}

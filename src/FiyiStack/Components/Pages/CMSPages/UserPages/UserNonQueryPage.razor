@@ -1,0 +1,552 @@
+﻿@page "/cms/cms/usernonquerypage/{UserId:int}"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+@using FiyiStack.Areas.CMS.UserBack.Repositories;
+@using FiyiStack.Areas.CMS.UserBack.Entities;
+@using FiyiStack.Areas.CMS.UserBack.DTOs;
+
+@inject UserRepository userRepository;
+@inject IJSRuntime IJSRuntime;
+
+<!--FOREIGN CALLS (TABLES)-->
+@using FiyiStack.Areas.CMS.RoleBack.Entities;
+@using FiyiStack.Areas.CMS.RoleBack.Repositories;
+@inject RoleRepository roleRepository;
+
+
+@if (UserId == 0)
+{
+    <PageTitle>Agregar user - CMS</PageTitle>
+}
+else
+{
+    <PageTitle>Editar user - CMS</PageTitle>
+}
+
+<FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard lstFoldersAndPagesForSideNavDTO="ListFoldersAndPagesForSideNavDTO"></FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard>
+
+<div class="main-content position-relative max-height-vh-100 h-100">
+    <FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard Pagina="User"></FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard>
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-300 border-radius-xl mt-4"
+             style="background-image: url('img/System/Landscape.jpg');">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+        </div>
+        <div class="card card-body mx-3 mx-md-4 mt-n6">
+            <div class="card-header mb-0 pb-0 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <h3 class="mb-3 mb-md-0">
+                        @if (UserId == 0)
+                        {
+                            <span>Agregar user</span>
+                        }
+                        else
+                        {
+                            <span>Editar user</span>
+                        }
+                    </h3>
+                    <div class="d-flex">
+                        <NavLink class="btn btn-white btn-sm" href="CMS/CMS/UserQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;
+                            Volver
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="alert alert-info text-white" role="alert">
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                </div>
+                <hr class="mt-3" />
+            </div>
+            <div class="card-body px-4">
+                <form method="post" @onsubmit="Submit"
+                      @formname="user-form" class="mb-4">
+                    <AntiforgeryToken />
+                    <!--Email-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="email">
+                            Email
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageEmail != "")
+                            {
+                                @((MarkupString)ErrorMessageEmail)
+                            }
+                        </label>
+                        <input type="email"
+                               id="email"
+                               class="form-control pt-0"
+                               value="@User!.Email"
+                               @onchange="HandleEmailChange" />
+                    </div>
+                    <!--Password-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="password">
+                            Password
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessagePassword != "")
+                            {
+                                @((MarkupString)ErrorMessagePassword)
+                            }
+                        </label>
+                        <input type="password"
+                               id="password"
+                               class="form-control pt-0"
+                               value="@User!.Password"
+                               @onchange="HandlePasswordChange"/>
+                    </div>
+                    <!--RoleId-->
+                    <div class="input-group input-group-static">
+                        <label>
+                            RoleId
+                            <span class="text-danger">*</span>
+                            @if (ErrorMessageRoleId != "")
+                            {
+                                @((MarkupString)ErrorMessageRoleId)
+                            }
+                        </label>
+                        <input type="text"
+                               readonly
+                               class="form-control pt-0"
+                               @bind="RoleName"/>
+                        <input type="hidden"
+                               id="roleid"
+                               value="@User!.RoleId"/>
+                    </div>
+                    <button type="button" 
+                    class="btn btn-dark mb-5 pb-2" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#roleidmodal">
+                        Seleccionar
+                    </button>
+                    
+                    <hr />
+                    @((MarkupString)Message)
+                    <div class="d-flex justify-content-between">
+                        <button id="btn-submit" 
+                        type="submit"
+                        class="btn btn-success"
+                        disabled="@IsSubmitting">
+                            @if (IsSubmitting)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>&nbsp;Guardando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-pen"></i>
+                                <span>&nbsp;@(UserId == 0 ? "Agregar" : "Editar")</span>
+                            }
+                        </button>
+                        <NavLink class="btn btn-white mx-3" href="CMS/CMS/UserQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;Volver
+                        </NavLink>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    <!-- Modal for RoleId-->
+    <div class="modal fade" 
+        id="roleidmodal" 
+        tabindex="-1" 
+        aria-labelledby="roleidmodallabel" 
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roleidmodallabel">
+                        Role
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group input-group-dynamic">
+                        <span class="input-group-text">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </span>
+                        <input class="form-control pt-0"
+                                @oninput="SearchTextRoleId"
+                                type="search">
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (Role role in ListRole)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="radio" 
+                                            id="@role-role.RoleId" 
+                                            name="roleid"
+                                            value="@role.RoleId"
+                                            @onclick="@(() => HandleRoleIdChange(role.RoleId))">
+                                        </td>
+                                        <td>
+                                            @role.RoleId
+                                        </td>
+                                        <td>
+                                            @role.Name
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" 
+                    class="btn btn-dark mb-0" 
+                    data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard>
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard>
+</div>
+
+@code {
+
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+
+    #region Properties
+    private List<FolderAndPagesForCMSDTO> ListFoldersAndPagesForSideNavDTO = [];
+
+    [Parameter]
+    public int UserId { get; set; }
+
+    private string Message { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    private User User { get; set; } = new();
+
+    private bool IsSubmitting = false;
+
+    //Error messages for inputs
+    private string ErrorMessageUserId { get; set; } = "";
+    private string ErrorMessageDateTimeCreation { get; set; } = "";
+    private string ErrorMessageDateTimeLastModification { get; set; } = "";
+    private string ErrorMessageUserCreationId { get; set; } = "";
+    private string ErrorMessageUserLastModificationId { get; set; } = "";
+    private string ErrorMessageActive { get; set; } = "";
+    private string ErrorMessageEmail { get; set; } = "";
+    private string ErrorMessagePassword { get; set; } = "";
+    private string ErrorMessageRoleId { get; set; } = "";
+    
+    
+    //FOREIGN LISTS (TABLES)
+    private List<Role> ListRole { get; set; } = [];
+    private string RoleName { get; set; } = "";
+    
+
+    //CANCELATION TOKENS
+    private CancellationTokenSource CancellationTokenSourceForRoleModalSearchBar = new();
+    
+    #endregion
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                await base.IsUserAvailableToUseThisPage("/CMS/CMS/Userquerypage");
+
+                ListFoldersAndPagesForSideNavDTO = await rolemenuRepository
+                    .GetAllPagesAndFoldersForCMSByRoleIdAsync(base.User!.RoleId);
+
+                //FOREIGN LISTS (TABLES)
+                ListRole = await roleRepository.GetAllByRoleIdForModalAsync("");
+                    
+
+                if (UserId == 0)
+                {
+                    //Create new User
+                    User = new();
+                }
+                else
+                {
+                    //Edit User
+
+                    User = await userRepository
+                                .GetOneByUserIdAsync(UserId);
+
+                    Role Role = await roleRepository.GetOneByRoleIdAsync(User.RoleId);
+                    RoleName = Role.Name;
+                    
+                }  
+
+
+                Check("");
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (IsSubmitting)
+            {
+                return;
+            }
+
+            IsSubmitting = true;
+            await InvokeAsync(StateHasChanged);
+
+            if(Check("") != null)
+            {
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Atención", "No se puede guardar. Hay campos faltantes. Operación cancelada.", "warning");
+                return;
+            }
+
+            if (UserId == 0)
+            {
+                //Create new User
+                User.Active = true;
+                User.UserCreationId = User.UserId;
+                User.UserLastModificationId = User.UserId;
+                User.DateTimeCreation = DateTime.Now;
+                User.DateTimeLastModification = DateTime.Now;
+
+                await userRepository
+                    .AddAsync(User);
+  
+            }
+            else
+            {
+                //Update data
+                User.DateTimeLastModification = DateTime.Now;
+                User.UserLastModificationId = User.UserId;
+
+                await userRepository
+                    .UpdateAsync(User);
+            }
+            
+            NavigationManager.NavigateTo("/cms/cms/userquerypage");
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            //Re-render the page
+            IsSubmitting = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+
+    #region Uploaders
+    
+    #endregion   
+
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+
+    #region SEARCHERS FOR FOREIGN TABLES
+    private async Task SearchTextRoleId(ChangeEventArgs args)
+    {
+        CancellationTokenSourceForRoleModalSearchBar.Cancel();
+        CancellationTokenSourceForRoleModalSearchBar = new();
+
+        try
+        {
+            await Task.Delay(300, CancellationTokenSourceForRoleModalSearchBar.Token);
+
+            string TextToSearch = args.Value.ToString();
+
+            ListRole = await roleRepository.GetAllByRoleIdForModalAsync(TextToSearch);
+        }
+        catch (TaskCanceledException)
+        {
+            //User still writing, do nothing and wait for the next event to trigger
+        }
+        catch (Exception ex)
+        {
+            base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            //Re-render the page
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    #endregion
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="attributeToValid">Debe estar encapsulado en []. Ejemplo: [Boolean]</param>
+    /// <returns></returns>
+    private ValidationResult Check(string attributeToValid)
+    {
+        try
+        {
+            List<ValidationResult> lstValidationResult = new List<ValidationResult>();
+            ValidationContext ValidationContext = new ValidationContext(User);
+
+            bool IsValid = Validator.TryValidateObject(User, ValidationContext, lstValidationResult, true);
+
+            ValidationResult ValidationResult = lstValidationResult
+            .AsQueryable()
+            .FirstOrDefault(x => x.ErrorMessage.StartsWith(attributeToValid));
+
+            if (!IsValid)
+            {
+                Message = $@"<div class=""alert alert-warning text-white"" role=""alert"">
+                                Para guardar correctamente debe completar los siguientes puntos: <br/> <ul>";
+
+                foreach (var validationResult in lstValidationResult)
+                {
+                    validationResult.ErrorMessage = validationResult.ErrorMessage.Substring(validationResult.ErrorMessage.IndexOf(']') + 1);
+                    Message += $@"<li>{validationResult}</li>";
+                }
+
+                Message = Message + "</ul></div>";
+            }
+            else
+            {
+                Message = $@"<div class=""alert alert-successs text-white"" role=""alert"">
+                                Todos los datos ingresados son correctos
+                            </div>";
+            }
+
+
+            if (ValidationResult != null)
+            {
+                ValidationResult.ErrorMessage = ValidationResult.ErrorMessage.Substring(ValidationResult.ErrorMessage.IndexOf(']') + 1);
+            }
+
+            return ValidationResult;
+        }
+        catch (Exception ex)
+        {
+            base.CatchException(ex);
+
+            return null;
+        }
+        finally
+        {
+
+        }
+    }
+
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+
+    #region Handlers
+    private async Task HandleEmailChange(ChangeEventArgs e)
+    {
+        User.Email = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Email]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageEmail = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageEmail = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandlePasswordChange(ChangeEventArgs e)
+    {
+        User.Password = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Password]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessagePassword = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessagePassword = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleRoleIdChange(long roleid)
+    {
+        User.RoleId = roleid;
+        ValidationResult ValidationResult = Check("[RoleId]");
+
+        Role Role = await roleRepository.GetOneByRoleIdAsync(User.RoleId);
+        RoleName = Role.Name;
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageRoleId = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageRoleId = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        //Re-render the page to show ScannedText
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    #endregion
+}

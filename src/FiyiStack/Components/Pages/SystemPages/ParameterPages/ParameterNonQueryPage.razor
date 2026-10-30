@@ -1,0 +1,412 @@
+﻿@page "/cms/system/parameternonquerypage/{ParameterId:int}"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+@using FiyiStack.Areas.System.ParameterBack.Repositories;
+@using FiyiStack.Areas.System.ParameterBack.Entities;
+@using FiyiStack.Areas.System.ParameterBack.DTOs;
+
+@inject ParameterRepository parameterRepository;
+@inject IJSRuntime IJSRuntime;
+
+<!--FOREIGN CALLS (TABLES)-->
+
+
+@if (ParameterId == 0)
+{
+    <PageTitle>Agregar parameter - System</PageTitle>
+}
+else
+{
+    <PageTitle>Editar parameter - System</PageTitle>
+}
+
+<FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard lstFoldersAndPagesForSideNavDTO="ListFoldersAndPagesForSideNavDTO"></FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard>
+
+<div class="main-content position-relative max-height-vh-100 h-100">
+    <FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard Pagina="Parameter"></FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard>
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-300 border-radius-xl mt-4"
+             style="background-image: url('img/System/Landscape.jpg');">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+        </div>
+        <div class="card card-body mx-3 mx-md-4 mt-n6">
+            <div class="card-header mb-0 pb-0 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <h3 class="mb-3 mb-md-0">
+                        @if (ParameterId == 0)
+                        {
+                            <span>Agregar parameter</span>
+                        }
+                        else
+                        {
+                            <span>Editar parameter</span>
+                        }
+                    </h3>
+                    <div class="d-flex">
+                        <NavLink class="btn btn-white btn-sm" href="CMS/System/ParameterQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;
+                            Volver
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="alert alert-info text-white" role="alert">
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                </div>
+                <hr class="mt-3" />
+            </div>
+            <div class="card-body px-4">
+                <form method="post" @onsubmit="Submit"
+                      @formname="parameter-form" class="mb-4">
+                    <AntiforgeryToken />
+                    <!--Name-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="name">
+                            Name
+                            <span class="text-danger">*</span>
+                            
+                            @if(ErrorMessageName != "")
+                            {
+                            @((MarkupString)ErrorMessageName)
+                            }
+                        </label>
+                        <input type="text"
+                               id="name"
+                               class="form-control pt-0"
+                               value="@Parameter!.Name"
+                               @onchange="HandleNameChange" />
+                    </div>
+                    <!--Value-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="value">
+                            Value
+                            <span class="text-danger">*</span>
+                            
+                            @if(ErrorMessageValue != "")
+                            {
+                            @((MarkupString)ErrorMessageValue)
+                            }
+                        </label>
+                        <input type="text"
+                               id="value"
+                               class="form-control pt-0"
+                               value="@Parameter!.Value"
+                               @onchange="HandleValueChange" />
+                    </div>
+                    <!--IsPrivate-->
+                    <div class="form-check form-switch mb-5 pb-2">
+                        <input class="form-check-input"
+                        type="checkbox"
+                        @bind="@Parameter!.IsPrivate"
+                        id="isprivate" />
+                        <label class="form-check-label"
+                        for="isprivate">
+                            IsPrivate
+                        </label>
+                    </div>
+                    
+                    <hr />
+                    @((MarkupString)Message)
+                    <div class="d-flex justify-content-between">
+                        <button id="btn-submit" 
+                        type="submit"
+                        class="btn btn-success"
+                        disabled="@IsSubmitting">
+                            @if (IsSubmitting)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>&nbsp;Guardando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-pen"></i>
+                                <span>&nbsp;@(ParameterId == 0 ? "Agregar" : "Editar")</span>
+                            }
+                        </button>
+                        <NavLink class="btn btn-white mx-3" href="CMS/System/ParameterQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;Volver
+                        </NavLink>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    
+
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard>
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard>
+</div>
+
+@code {
+
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+
+    #region Properties
+    private List<FolderAndPagesForCMSDTO> ListFoldersAndPagesForSideNavDTO = [];
+
+    [Parameter]
+    public int ParameterId { get; set; }
+
+    private string Message { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    private Parameter Parameter { get; set; } = new();
+
+    private bool IsSubmitting = false;
+
+    //Error messages for inputs
+    private string ErrorMessageParameterId { get; set; } = "";
+    private string ErrorMessageDateTimeCreation { get; set; } = "";
+    private string ErrorMessageDateTimeLastModification { get; set; } = "";
+    private string ErrorMessageUserCreationId { get; set; } = "";
+    private string ErrorMessageUserLastModificationId { get; set; } = "";
+    private string ErrorMessageActive { get; set; } = "";
+    private string ErrorMessageName { get; set; } = "";
+    private string ErrorMessageValue { get; set; } = "";
+    private string ErrorMessageIsPrivate { get; set; } = "";
+    
+    
+    //FOREIGN LISTS (TABLES)
+    
+
+    //CANCELATION TOKENS
+    
+    #endregion
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                await base.IsUserAvailableToUseThisPage("/CMS/System/Parameterquerypage");
+
+                ListFoldersAndPagesForSideNavDTO = await rolemenuRepository
+                    .GetAllPagesAndFoldersForCMSByRoleIdAsync(base.User!.RoleId);
+
+                //FOREIGN LISTS (TABLES)
+                
+
+                if (ParameterId == 0)
+                {
+                    //Create new Parameter
+                    Parameter = new();
+                }
+                else
+                {
+                    //Edit Parameter
+
+                    Parameter = await parameterRepository
+                                .GetOneByParameterIdAsync(ParameterId);
+
+                    
+                }  
+
+
+                Check("");
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (IsSubmitting)
+            {
+                return;
+            }
+
+            IsSubmitting = true;
+            await InvokeAsync(StateHasChanged);
+
+            if(Check("") != null)
+            {
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Atención", "No se puede guardar. Hay campos faltantes. Operación cancelada.", "warning");
+                return;
+            }
+
+            if (ParameterId == 0)
+            {
+                //Create new Parameter
+                Parameter.Active = true;
+                Parameter.UserCreationId = User.UserId;
+                Parameter.UserLastModificationId = User.UserId;
+                Parameter.DateTimeCreation = DateTime.Now;
+                Parameter.DateTimeLastModification = DateTime.Now;
+
+                await parameterRepository
+                    .AddAsync(Parameter);
+  
+            }
+            else
+            {
+                //Update data
+                Parameter.DateTimeLastModification = DateTime.Now;
+                Parameter.UserLastModificationId = User.UserId;
+
+                await parameterRepository
+                    .UpdateAsync(Parameter);
+            }
+            
+            NavigationManager.NavigateTo("/cms/system/parameterquerypage");
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            //Re-render the page
+            IsSubmitting = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+
+    #region Uploaders
+    
+    #endregion   
+
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+
+    #region SEARCHERS FOR FOREIGN TABLES
+    
+    #endregion
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="attributeToValid">Debe estar encapsulado en []. Ejemplo: [Boolean]</param>
+    /// <returns></returns>
+    private ValidationResult Check(string attributeToValid)
+    {
+        try
+        {
+            List<ValidationResult> lstValidationResult = new List<ValidationResult>();
+            ValidationContext ValidationContext = new ValidationContext(Parameter);
+
+            bool IsValid = Validator.TryValidateObject(Parameter, ValidationContext, lstValidationResult, true);
+
+            ValidationResult ValidationResult = lstValidationResult
+            .AsQueryable()
+            .FirstOrDefault(x => x.ErrorMessage.StartsWith(attributeToValid));
+
+            if (!IsValid)
+            {
+                Message = $@"<div class=""alert alert-warning text-white"" role=""alert"">
+                                Para guardar correctamente debe completar los siguientes puntos: <br/> <ul>";
+
+                foreach (var validationResult in lstValidationResult)
+                {
+                    validationResult.ErrorMessage = validationResult.ErrorMessage.Substring(validationResult.ErrorMessage.IndexOf(']') + 1);
+                    Message += $@"<li>{validationResult}</li>";
+                }
+
+                Message = Message + "</ul></div>";
+            }
+            else
+            {
+                Message = $@"<div class=""alert alert-successs text-white"" role=""alert"">
+                                Todos los datos ingresados son correctos
+                            </div>";
+            }
+
+
+            if (ValidationResult != null)
+            {
+                ValidationResult.ErrorMessage = ValidationResult.ErrorMessage.Substring(ValidationResult.ErrorMessage.IndexOf(']') + 1);
+            }
+
+            return ValidationResult;
+        }
+        catch (Exception ex)
+        {
+            base.CatchException(ex);
+
+            return null;
+        }
+        finally
+        {
+
+        }
+    }
+
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+
+    #region Handlers
+    private async Task HandleNameChange(ChangeEventArgs e)
+    {
+        Parameter.Name = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Name]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageName = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageName = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleValueChange(ChangeEventArgs e)
+    {
+        Parameter.Value = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Value]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageValue = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageValue = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    #endregion
+}

@@ -1,0 +1,537 @@
+﻿@page "/cms/cms/menunonquerypage/{MenuId:int}"
+
+@inherits FiyiStack.Components.Base.CMSBase;
+
+@using FiyiStack.Areas.CMS.MenuBack.Repositories;
+@using FiyiStack.Areas.CMS.MenuBack.Entities;
+@using FiyiStack.Areas.CMS.MenuBack.DTOs;
+
+@inject MenuRepository menuRepository;
+@inject IJSRuntime IJSRuntime;
+
+<!--FOREIGN CALLS (TABLES)-->
+
+
+@if (MenuId == 0)
+{
+    <PageTitle>Agregar menu - CMS</PageTitle>
+}
+else
+{
+    <PageTitle>Editar menu - CMS</PageTitle>
+}
+
+<FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard lstFoldersAndPagesForSideNavDTO="ListFoldersAndPagesForSideNavDTO"></FiyiStack.Components.Shared.ComponentsForDashboard._SideNavForDashboard>
+
+<div class="main-content position-relative max-height-vh-100 h-100">
+    <FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard Pagina="Menu"></FiyiStack.Components.Shared.ComponentsForDashboard._NavBarForDashboard>
+    <div class="container-fluid px-2 px-md-4">
+        <div class="page-header min-height-300 border-radius-xl mt-4"
+             style="background-image: url('img/System/Landscape.jpg');">
+            <span class="mask bg-gradient-dark opacity-6"></span>
+        </div>
+        <div class="card card-body mx-3 mx-md-4 mt-n6">
+            <div class="card-header mb-0 pb-0 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <h3 class="mb-3 mb-md-0">
+                        @if (MenuId == 0)
+                        {
+                            <span>Agregar menu</span>
+                        }
+                        else
+                        {
+                            <span>Editar menu</span>
+                        }
+                    </h3>
+                    <div class="d-flex">
+                        <NavLink class="btn btn-white btn-sm" href="CMS/CMS/MenuQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;
+                            Volver
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="alert alert-info text-white" role="alert">
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                </div>
+                <hr class="mt-3" />
+            </div>
+            <div class="card-body px-4">
+                <form method="post" @onsubmit="Submit"
+                      @formname="menu-form" class="mb-4">
+                    <AntiforgeryToken />
+                    <!--Name-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="name">
+                            Name
+                            <span class="text-danger">*</span>
+                            
+                            @if(ErrorMessageName != "")
+                            {
+                            @((MarkupString)ErrorMessageName)
+                            }
+                        </label>
+                        <input type="text"
+                               id="name"
+                               class="form-control pt-0"
+                               value="@Menu!.Name"
+                               @onchange="HandleNameChange" />
+                    </div>
+                    <!--MenuFatherId-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="menufatherid">
+                            MenuFatherId
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageMenuFatherId != "")
+                            {
+                                @((MarkupString)ErrorMessageMenuFatherId)
+                            }
+                        </label>
+                        <input type="number"
+                        step="1" 
+                        id="menufatherid"
+                        class="form-control pt-0"
+                        value="@Menu!.MenuFatherId"
+                        @onchange="HandleMenuFatherIdChange" />
+                    </div>
+                    <!--URLPath-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="urlpath">
+                            URLPath
+                            
+                            
+                            @if(ErrorMessageURLPath != "")
+                            {
+                            @((MarkupString)ErrorMessageURLPath)
+                            }
+                        </label>
+                        <input type="text"
+                               id="urlpath"
+                               class="form-control pt-0"
+                               value="@Menu!.URLPath"
+                               @onchange="HandleURLPathChange" />
+                    </div>
+                    <!--IconURLPath-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="iconurlpath">
+                            IconURLPath
+                            
+                            
+                            @if(ErrorMessageIconURLPath != "")
+                            {
+                            @((MarkupString)ErrorMessageIconURLPath)
+                            }
+                        </label>
+                        <input type="text"
+                               id="iconurlpath"
+                               class="form-control pt-0"
+                               value="@Menu!.IconURLPath"
+                               @onchange="HandleIconURLPathChange" />
+                    </div>
+                    <!--Order-->
+                    <div class="input-group input-group-static mb-5 pb-2">
+                        <label for="order">
+                            Order
+                            <span class="text-danger">*</span>
+                            
+                            @if (ErrorMessageOrder != "")
+                            {
+                                @((MarkupString)ErrorMessageOrder)
+                            }
+                        </label>
+                        <input type="number"
+                        step="1" 
+                        id="order"
+                        class="form-control pt-0"
+                        value="@Menu!.Order"
+                        @onchange="HandleOrderChange" />
+                    </div>
+                    
+                    <hr />
+                    @((MarkupString)Message)
+                    <div class="d-flex justify-content-between">
+                        <button id="btn-submit" 
+                        type="submit"
+                        class="btn btn-success"
+                        disabled="@IsSubmitting">
+                            @if (IsSubmitting)
+                            {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>&nbsp;Guardando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-pen"></i>
+                                <span>&nbsp;@(MenuId == 0 ? "Agregar" : "Editar")</span>
+                            }
+                        </button>
+                        <NavLink class="btn btn-white mx-3" href="CMS/CMS/MenuQueryPage">
+                            <span class="fas fa-chevron-left"></span>
+                            &nbsp;Volver
+                        </NavLink>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    <!-- MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS MODALS FOR FOREIGN KEYS -->
+    
+
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FixedPluginForDashboard>
+    <FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard></FiyiStack.Components.Shared.ComponentsForDashboard._FooterForDashboard>
+</div>
+
+@code {
+
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+    //PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIESPROPERTIES PROPERTIES PROPERTIES PROPERTIES PROPERTIES
+
+    #region Properties
+    private List<FolderAndPagesForCMSDTO> ListFoldersAndPagesForSideNavDTO = [];
+
+    [Parameter]
+    public int MenuId { get; set; }
+
+    private string Message { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    private Menu Menu { get; set; } = new();
+
+    private bool IsSubmitting = false;
+
+    //Error messages for inputs
+    private string ErrorMessageMenuId { get; set; } = "";
+    private string ErrorMessageDateTimeCreation { get; set; } = "";
+    private string ErrorMessageDateTimeLastModification { get; set; } = "";
+    private string ErrorMessageUserCreationId { get; set; } = "";
+    private string ErrorMessageUserLastModificationId { get; set; } = "";
+    private string ErrorMessageActive { get; set; } = "";
+    private string ErrorMessageName { get; set; } = "";
+    private string ErrorMessageMenuFatherId { get; set; } = "";
+    private string ErrorMessageURLPath { get; set; } = "";
+    private string ErrorMessageIconURLPath { get; set; } = "";
+    private string ErrorMessageOrder { get; set; } = "";
+    
+    
+    //FOREIGN LISTS (TABLES)
+    
+
+    //CANCELATION TOKENS
+    
+    #endregion
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await base.GetUserIdFromCookies();
+
+                await base.IsUserAvailableToUseThisPage("/CMS/CMS/Menuquerypage");
+
+                ListFoldersAndPagesForSideNavDTO = await rolemenuRepository
+                    .GetAllPagesAndFoldersForCMSByRoleIdAsync(base.User!.RoleId);
+
+                //FOREIGN LISTS (TABLES)
+                
+
+                if (MenuId == 0)
+                {
+                    //Create new Menu
+                    Menu = new();
+                }
+                else
+                {
+                    //Edit Menu
+
+                    Menu = await menuRepository
+                                .GetOneByMenuIdAsync(MenuId);
+
+                    
+                }  
+
+
+                Check("");
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (IsSubmitting)
+            {
+                return;
+            }
+
+            IsSubmitting = true;
+            await InvokeAsync(StateHasChanged);
+
+            if(Check("") != null)
+            {
+                await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Atención", "No se puede guardar. Hay campos faltantes. Operación cancelada.", "warning");
+                return;
+            }
+
+            if (MenuId == 0)
+            {
+                //Create new Menu
+                Menu.Active = true;
+                Menu.UserCreationId = User.UserId;
+                Menu.UserLastModificationId = User.UserId;
+                Menu.DateTimeCreation = DateTime.Now;
+                Menu.DateTimeLastModification = DateTime.Now;
+
+                await menuRepository
+                    .AddAsync(Menu);
+  
+            }
+            else
+            {
+                //Update data
+                Menu.DateTimeLastModification = DateTime.Now;
+                Menu.UserLastModificationId = User.UserId;
+
+                await menuRepository
+                    .UpdateAsync(Menu);
+            }
+            
+            NavigationManager.NavigateTo("/cms/cms/menuquerypage");
+        }
+        catch (Exception ex)
+        {
+            await base.CatchException(ex);
+
+            await IJSRuntime.InvokeVoidAsync("toastHelper.showWithLimitedTime", "Error", "Hubo un error. Intente nuevamente.", "error");
+        }
+        finally
+        {
+            //Re-render the page
+            IsSubmitting = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+    //UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERSUPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS UPLOADERS 
+
+    #region Uploaders
+    
+    #endregion   
+
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+    //SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN TABLESSEARCHERS FOR FOREIGN TABLES SEARCHERS FOR FOREIGN 
+
+    #region SEARCHERS FOR FOREIGN TABLES
+    
+    #endregion
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="attributeToValid">Debe estar encapsulado en []. Ejemplo: [Boolean]</param>
+    /// <returns></returns>
+    private ValidationResult Check(string attributeToValid)
+    {
+        try
+        {
+            List<ValidationResult> lstValidationResult = new List<ValidationResult>();
+            ValidationContext ValidationContext = new ValidationContext(Menu);
+
+            bool IsValid = Validator.TryValidateObject(Menu, ValidationContext, lstValidationResult, true);
+
+            ValidationResult ValidationResult = lstValidationResult
+            .AsQueryable()
+            .FirstOrDefault(x => x.ErrorMessage.StartsWith(attributeToValid));
+
+            if (!IsValid)
+            {
+                Message = $@"<div class=""alert alert-warning text-white"" role=""alert"">
+                                Para guardar correctamente debe completar los siguientes puntos: <br/> <ul>";
+
+                foreach (var validationResult in lstValidationResult)
+                {
+                    validationResult.ErrorMessage = validationResult.ErrorMessage.Substring(validationResult.ErrorMessage.IndexOf(']') + 1);
+                    Message += $@"<li>{validationResult}</li>";
+                }
+
+                Message = Message + "</ul></div>";
+            }
+            else
+            {
+                Message = $@"<div class=""alert alert-successs text-white"" role=""alert"">
+                                Todos los datos ingresados son correctos
+                            </div>";
+            }
+
+
+            if (ValidationResult != null)
+            {
+                ValidationResult.ErrorMessage = ValidationResult.ErrorMessage.Substring(ValidationResult.ErrorMessage.IndexOf(']') + 1);
+            }
+
+            return ValidationResult;
+        }
+        catch (Exception ex)
+        {
+            base.CatchException(ex);
+
+            return null;
+        }
+        finally
+        {
+
+        }
+    }
+
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+    //HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE HANDLERS OF CHANGE
+
+    #region Handlers
+    private async Task HandleNameChange(ChangeEventArgs e)
+    {
+        Menu.Name = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[Name]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageName = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageName = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleMenuFatherIdChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            Menu.MenuFatherId = result;
+        }
+        else
+        {
+            Menu.MenuFatherId = 0;
+        }
+
+        ValidationResult ValidationResult = Check("[MenuFatherId]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageMenuFatherId = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageMenuFatherId = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleURLPathChange(ChangeEventArgs e)
+    {
+        Menu.URLPath = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[URLPath]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageURLPath = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageURLPath = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleIconURLPathChange(ChangeEventArgs e)
+    {
+        Menu.IconURLPath = e.Value?.ToString();
+        ValidationResult ValidationResult = Check("[IconURLPath]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageIconURLPath = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageIconURLPath = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task HandleOrderChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            Menu.Order = result;
+        }
+        else
+        {
+            Menu.Order = 0;
+        }
+
+        ValidationResult ValidationResult = Check("[Order]");
+
+        if (ValidationResult == null)
+        {
+            ErrorMessageOrder = $@"<span class=""text-success"">
+                <i class=""fas fa-circle-check""></i>
+            </span>";
+        }
+        else
+        {
+            ErrorMessageOrder = $@"<span class=""text-danger"">
+                <i class=""fas fa-circle-xmark""></i>
+                {ValidationResult.ErrorMessage}
+            </span>";
+        }
+
+        
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    #endregion
+}

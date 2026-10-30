@@ -1,0 +1,9 @@
+.env
+
+/.vs
+
+/src/FiyiStack/obj/
+
+/src/FiyiStack/bin
+
+/src/FiyiStack/.env

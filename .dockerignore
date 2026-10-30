@@ -1,0 +1,42 @@
+﻿# Archivos generados por .NET
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+**/*.coverage
+**/*.coveragexml
+
+# Configuracion local del IDE y perfiles de publicacion
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.suo
+**/Properties/PublishProfiles/
+PublishSettings/
+.claude/
+.codex/
+.agents/
+
+# Variables y configuracion de desarrollo local
+.env
+.env.*
+appsettings.Development.json
+
+# Dependencias frontend (conservar los recursos de wwwroot)
+**/node_modules/
+
+# Backups y registros locales
+Backup/
+DatabaseBackups/
+**/*.log
+
+# Metadatos, documentacion y archivos de Docker
+.git/
+.github/
+.gitignore
+**/*.md
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+.dockerignore
