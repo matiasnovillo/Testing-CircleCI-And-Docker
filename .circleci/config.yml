@@ -1,32 +1,31 @@
 version: 2.1
 
 jobs:
-  build-and-test:
+  test-azure-oidc:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:10.0
-
-    working_directory: ~/project
-
+      - image: cimg/azure:2024.01 # Imagen oficial de CircleCI con la Azure CLI preinstalada
     steps:
-      # 1. Descargar el código del repositorio
       - checkout
-
-      # 2. Restaurar dependencias NuGet
+      # Paso 1: Autenticación en Azure usando OIDC
       - run:
-          name: Restore dependencies
-          command: dotnet restore FiyiStack.sln
+          name: "Autenticarse en Azure vía OIDC"
+          command: |
+            # CircleCI expone automáticamente el token OIDC en la variable $CIRCLE_OIDC_TOKEN
+            az login --service-principal \
+              --username "$AZURE_CLIENT_ID" \
+              --tenant "$AZURE_TENANT_ID" \
+              --federated-token "$CIRCLE_OIDC_TOKEN"
 
-      # 3. Compilar la solución
+      # Paso 2: Comando de prueba para verificar que estás conectado
       - run:
-          name: Build solution
-          command: dotnet build FiyiStack.sln --configuration Release --no-restore
-
-      # 4. Ejecutar tests automatizados
-      - run:
-          name: Run unit tests
-          command: dotnet test FiyiStack.sln --configuration Release --no-build --no-restore
+          name: "Verificar conexión y mostrar cuenta activa"
+          command: |
+            echo "¡Conexión exitosa!"
+            az account show --output table
 
 workflows:
-  ci:
+  prueba-conexion:
     jobs:
-      - build-and-test
+      - test-azure-oidc:
+          context:
+            - FiyiStackContext

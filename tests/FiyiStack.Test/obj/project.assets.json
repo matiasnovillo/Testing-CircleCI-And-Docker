@@ -1076,11 +1076,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI\\FiyiStack\\tests\\FiyiStack.Test\\FiyiStack.Test.csproj",
+      "projectUniqueName": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI.Docker\\Testing-CircleCI-And-Docker\\tests\\FiyiStack.Test\\FiyiStack.Test.csproj",
       "projectName": "FiyiStack.Test",
-      "projectPath": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI\\FiyiStack\\tests\\FiyiStack.Test\\FiyiStack.Test.csproj",
+      "projectPath": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI.Docker\\Testing-CircleCI-And-Docker\\tests\\FiyiStack.Test\\FiyiStack.Test.csproj",
       "packagesPath": "C:\\Users\\Matias\\.nuget\\packages\\",
-      "outputPath": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI\\FiyiStack\\tests\\FiyiStack.Test\\obj\\",
+      "outputPath": "C:\\FiyiStack\\G2-Blazor.NET8.Linux.CircleCI.Docker\\Testing-CircleCI-And-Docker\\tests\\FiyiStack.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
