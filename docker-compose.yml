@@ -7,7 +7,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4.0"
+          cpus: "2.0"
           memory: 4G
     ports:
       - "127.0.0.1:1433:1433"

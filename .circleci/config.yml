@@ -1,30 +1,98 @@
 version: 2.1
 
+orbs:
+  azure-acr: circleci/azure-acr@0.2.0
+
 jobs:
-  test-azure-oidc:
+  build_and_test:
     docker:
-      - image: cimg/azure:2026.10.1
+      - image: mcr.microsoft.com/dotnet/sdk:10.0
+    steps:
+      # 1. Descargar el código del repositorio
+      - checkout
+      # 2. Restaurar dependencias NuGet
+      - run:
+          name: Restore dependencies
+          command: dotnet restore FiyiStack.sln
+      # 3. Compilar la solución
+      - run:
+          name: Build solution
+          command: dotnet build FiyiStack.sln --configuration Release --no-restore
+      # 4. Ejecutar tests automatizados
+      - run:
+          name: Run unit tests
+          command: dotnet test FiyiStack.sln --configuration Release --no-build --no-restore
+
+  build_and_push_image:
+    machine:
+      image: ubuntu-2204:current
     steps:
       - checkout
-      # Paso 1: Autenticación en Azure usando OIDC
+      - setup_remote_docker
       - run:
-          name: "Autenticarse en Azure vía OIDC"
+          name: Log in to Azure via OIDC
           command: |
             az login --service-principal \
               --username "$AZURE_CLIENT_ID" \
               --tenant "$AZURE_TENANT_ID" \
               --federated-token "$CIRCLE_OIDC_TOKEN"
-
-      # Paso 2: Comando de prueba para verificar que estás conectado
       - run:
-          name: "Verificar conexión y mostrar cuenta activa"
+          name: Log in to Azure Container Registry
+          command: az acr login --name "$AZURE_ACR_NAME"
+      - run:
+          name: Build and Push Docker Image
           command: |
-            echo "¡Conexión exitosa!"
-            az account show --output table
+            # Construye la imagen usando tu Dockerfile
+            docker build -t $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 .
+            # Sube la imagen al ACR
+            docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1
+
+  deploy_to_vm:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "TU_FINGERPRINT_DE_SSH_EN_CIRCLECI" # Reemplaza con el fingerprint de tu llave privada
+      - run:
+          name: Deploy via SSH to Azure VM
+          command: |
+            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP << EOF
+              # 1. Autenticar la VM contra el ACR usando la identidad gestionada de la VM o credenciales temporales
+              az login --identity || true # Si la VM tiene una Managed Identity asignada con rol AcrPull
+              az acr login --name "$AZURE_ACR_NAME"
+              
+              # 2. Bajar la nueva imagen
+              docker pull ${AZURE_ACR_NAME}.azurecr.io/fiyistack-app:${CIRCLE_SHA1}
+              
+              # 3. Frenar el contenedor viejo y levantar el nuevo (o actualizar vía docker-compose)
+              docker stop fiyistack-container || true
+              docker rm fiyistack-container || true
+              
+              docker run -d \
+                --name fiyistack-container \
+                -p 8080:8080 \
+                --restart unless-stopped \
+                ${AZURE_ACR_NAME}.azurecr.io/fiyistack-app:${CIRCLE_SHA1}
+            EOF
 
 workflows:
-  prueba-conexion:
+  version: 2
+  ci_cd_pipeline:
     jobs:
-      - test-azure-oidc:
-          context:
-            - FiyiStackContext
+      - build_and_test
+      - build_and_push_image:
+          context: FiyiStackContext
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: main
+      #- deploy_to_vm:
+      #    context: azure-context
+      #    requires:
+      #      - build_and_push_image
+      #    filters:
+      #      branches:
+      #        only: main

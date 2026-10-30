@@ -1,0 +1,30 @@
+version: 2.1
+
+jobs:
+  test-azure-oidc:
+    docker:
+      - image: cimg/azure:2026.10.1
+    steps:
+      - checkout
+      # Paso 1: Autenticación en Azure usando OIDC
+      - run:
+          name: "Autenticarse en Azure vía OIDC"
+          command: |
+            az login --service-principal \
+              --username "$AZURE_CLIENT_ID" \
+              --tenant "$AZURE_TENANT_ID" \
+              --federated-token "$CIRCLE_OIDC_TOKEN"
+
+      # Paso 2: Comando de prueba para verificar que estás conectado
+      - run:
+          name: "Verificar conexión y mostrar cuenta activa"
+          command: |
+            echo "¡Conexión exitosa!"
+            az account show --output table
+
+workflows:
+  prueba-conexion:
+    jobs:
+      - test-azure-oidc:
+          context:
+            - FiyiStackContext
