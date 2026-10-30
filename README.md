@@ -1,4 +1,4 @@
-# FiyiStack
+# Aplicación web de prueba
 
 Proyecto de prueba sobre los siguientes conceptos:
 - Linux
