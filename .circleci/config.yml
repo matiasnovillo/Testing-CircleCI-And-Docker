@@ -21,7 +21,7 @@ jobs:
           name: "Verificar conexión y mostrar cuenta activa"
           command: |
             echo "¡Conexión exitosa!"
-            az account show --output table
+            az account show --tenant "$AZURE_TENANT_ID" --output table
 
 workflows:
   prueba-conexion:
