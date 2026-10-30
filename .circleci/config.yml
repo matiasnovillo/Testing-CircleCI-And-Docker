@@ -24,8 +24,8 @@ jobs:
           command: dotnet test FiyiStack.sln --configuration Release --no-build --no-restore
 
   build_and_push_image:
-    machine:
-      image: ubuntu-2204:current
+    docker:
+      - image: cimg/azure:2024.01
     steps:
       - checkout
       - setup_remote_docker
