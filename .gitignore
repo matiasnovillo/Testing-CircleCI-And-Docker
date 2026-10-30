@@ -2,8 +2,12 @@
 
 /.vs
 
-/src/FiyiStack/obj/
+/src/FiyiStack/obj
 
 /src/FiyiStack/bin
 
 /src/FiyiStack/.env
+
+/tests/FiyiStack.Test/bin
+
+/tests/FiyiStack.Test/obj

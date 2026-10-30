@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FiyiStack.Test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1ec240be958b0e6c4719bbc6e97712b04329c44a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FiyiStack.Test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FiyiStack.Test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
