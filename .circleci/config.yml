@@ -10,7 +10,6 @@ jobs:
       - run:
           name: "Autenticarse en Azure vía OIDC"
           command: |
-            # CircleCI expone automáticamente el token OIDC en la variable $CIRCLE_OIDC_TOKEN
             az login --service-principal \
               --username "$AZURE_CLIENT_ID" \
               --tenant "$AZURE_TENANT_ID" \
