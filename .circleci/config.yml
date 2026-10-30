@@ -43,7 +43,7 @@ jobs:
           name: Build and Push Docker Image
           command: |
             # Construye la imagen usando tu Dockerfile
-            docker build -t $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 .
+            docker build -f src/FiyiStack/Dockerfile -t $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 src/FiyiStack
             # Sube la imagen al ACR
             docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1
 
