@@ -102,6 +102,8 @@ jobs:
               # 2. Bajar la nueva imagen
               sudo -n docker --config "\$DOCKER_CONFIG_DIR" pull "\$ACR_LOGIN_SERVER/fiyistack-app:${CIRCLE_SHA1}"
               
+              # Verificar el archivo antes de detener el contenedor actual.
+              test -r /home/fiyistack-su/fiyistack/.env
               # 3. Frenar el contenedor viejo y levantar el nuevo (o actualizar vía docker-compose)
               if sudo -n docker container inspect fiyistack-container > /dev/null 2>&1; then
                 sudo -n docker stop fiyistack-container
@@ -110,6 +112,7 @@ jobs:
               
               sudo -n docker run -d \
                 --name fiyistack-container \
+                --env-file /home/fiyistack-su/fiyistack/.env \
                 -p 8080:8080 \
                 --restart unless-stopped \
                 "\$ACR_LOGIN_SERVER/fiyistack-app:${CIRCLE_SHA1}"
