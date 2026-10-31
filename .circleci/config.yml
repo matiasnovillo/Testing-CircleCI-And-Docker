@@ -70,7 +70,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "TU_FINGERPRINT_DE_SSH_EN_CIRCLECI" # Reemplaza con el fingerprint de tu llave privada
+            - "SHA256:rWonafvavuzFcGNGUaXApnF7oZBtQjobgs+5UugevMk"
       - run:
           name: Deploy via SSH to Azure VM
           command: |
@@ -105,10 +105,10 @@ workflows:
           filters:
             branches:
               only: main
-      #- deploy_to_vm:
-      #    context: azure-context
-      #    requires:
-      #      - build_and_push_image
-      #    filters:
-      #      branches:
-      #        only: main
+      - deploy_to_vm:
+          context: FiyiStackContext
+          requires:
+            - build_and_push_image
+          filters:
+            branches:
+              only: main
