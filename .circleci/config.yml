@@ -8,17 +8,13 @@ jobs:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:10.0
     steps:
-      # 1. Descargar el código del repositorio
       - checkout
-      # 2. Restaurar dependencias NuGet
       - run:
           name: Restore dependencies
           command: dotnet restore FiyiStack.sln
-      # 3. Compilar la solución
       - run:
           name: Build solution
           command: dotnet build FiyiStack.sln --configuration Release --no-restore
-      # 4. Ejecutar tests automatizados
       - run:
           name: Run unit tests
           command: dotnet test FiyiStack.sln --configuration Release --no-build --no-restore
