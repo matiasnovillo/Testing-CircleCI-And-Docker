@@ -5,10 +5,23 @@ using FiyiStack.Services.System;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using Microsoft.Data.SqlClient;
 
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
-    Env.Load();
+    var solutionDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+    while (solutionDirectory != null &&
+           !File.Exists(Path.Combine(solutionDirectory.FullName, "FiyiStack.sln")))
+    {
+        solutionDirectory = solutionDirectory.Parent;
+    }
+
+    if (solutionDirectory == null)
+    {
+        throw new DirectoryNotFoundException("No se encontro FiyiStack.sln para localizar el .env de desarrollo.");
+    }
+
+    Env.Load(Path.Combine(solutionDirectory.FullName, ".env"));
 }
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +35,22 @@ builder.Services.AddRazorComponents()
 
 //ADD SERVICE TO USE DATABASE (SCOPED)
 string DbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+if (string.IsNullOrWhiteSpace(DbConnectionString))
+{
+    throw new InvalidOperationException("Configura ConnectionStrings__DefaultConnection antes de iniciar la aplicacion.");
+}
+
+// Desde el IDE se usa el puerto publicado; dentro de Compose se usa el nombre del servicio.
+if (builder.Environment.IsDevelopment() &&
+    !string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true", StringComparison.OrdinalIgnoreCase))
+{
+    var connection = new SqlConnectionStringBuilder(DbConnectionString);
+    if (string.Equals(connection.DataSource, "fiyistack-db", StringComparison.OrdinalIgnoreCase))
+    {
+        connection.DataSource = "tcp:127.0.0.1,1433";
+        DbConnectionString = connection.ConnectionString;
+    }
+}
 
 builder.Services.AddDbContextFactory<FiyiStackDbContext>(options =>
     options.UseSqlServer(DbConnectionString));
