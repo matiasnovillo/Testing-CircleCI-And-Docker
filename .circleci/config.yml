@@ -38,13 +38,18 @@ jobs:
               -t "$AZURE_TENANT_ID" \
               --federated-token "$CIRCLE_OIDC_TOKEN"
       - run:
-          name: Wait for ACR DNS Resolution and Log in
+          name: Resolve ACR login server and log in
           command: |
-            echo "Verificando resolución DNS para ${AZURE_ACR_NAME}.azurecr.io..."
-            # Reintenta hasta 5 veces si el DNS no responde de inmediato
-            for i in {1..5}; do
-              nslookup ${AZURE_ACR_NAME}.azurecr.io && break || sleep 3
-            done
+            # Azure puede asignar un loginServer distinto de <nombre>.azurecr.io.
+            ACR_LOGIN_SERVER=$(az acr show \
+              --name "$AZURE_ACR_NAME" \
+              --query loginServer \
+              --output tsv)
+            if [ -z "$ACR_LOGIN_SERVER" ] || [ "$ACR_LOGIN_SERVER" = "null" ]; then
+              echo "No se pudo obtener loginServer (Servidor de inicio de sesion). Revisa AZURE_ACR_NAME y la suscripción de Azure." >&2
+              exit 1
+            fi
+            printf 'export ACR_LOGIN_SERVER=%q\n' "$ACR_LOGIN_SERVER" >> "$BASH_ENV"
             az acr login --name "$AZURE_ACR_NAME"
       - run:
           name: Build and Push Docker Image
@@ -52,11 +57,11 @@ jobs:
             # El contexto debe coincidir con las rutas COPY del Dockerfile.
             docker build \
               --file src/FiyiStack/Dockerfile \
-              --tag "$AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1" \
+              --tag "$ACR_LOGIN_SERVER/fiyistack-app:$CIRCLE_SHA1" \
               src/FiyiStack
             # Agregamos un retry automático al push por si hay fluctuaciones en la red remota
-            docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 || \
-            (sleep 5 && docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1)
+            docker push "$ACR_LOGIN_SERVER/fiyistack-app:$CIRCLE_SHA1" || \
+            (sleep 5 && docker push "$ACR_LOGIN_SERVER/fiyistack-app:$CIRCLE_SHA1")
 
   deploy_to_vm:
     machine:
