@@ -49,7 +49,11 @@ jobs:
       - run:
           name: Build and Push Docker Image
           command: |
-            docker build -t $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 .
+            # El contexto debe coincidir con las rutas COPY del Dockerfile.
+            docker build \
+              --file src/FiyiStack/Dockerfile \
+              --tag "$AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1" \
+              src/FiyiStack
             # Agregamos un retry automático al push por si hay fluctuaciones en la red remota
             docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1 || \
             (sleep 5 && docker push $AZURE_ACR_NAME.azurecr.io/fiyistack-app:$CIRCLE_SHA1)
