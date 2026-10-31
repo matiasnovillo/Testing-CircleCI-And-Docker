@@ -7,9 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.Data.SqlClient;
 
+//LOAD .ENV
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
+
     var solutionDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+
     while (solutionDirectory != null &&
            !File.Exists(Path.Combine(solutionDirectory.FullName, "FiyiStack.sln")))
     {
@@ -18,7 +21,7 @@ if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development
 
     if (solutionDirectory == null)
     {
-        throw new DirectoryNotFoundException("No se encontro FiyiStack.sln para localizar el .env de desarrollo.");
+        throw new DirectoryNotFoundException("FiyiStack.sln was not found, so the development .env file could not be located.");
     }
 
     Env.Load(Path.Combine(solutionDirectory.FullName, ".env"));
@@ -37,10 +40,10 @@ builder.Services.AddRazorComponents()
 string DbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 if (string.IsNullOrWhiteSpace(DbConnectionString))
 {
-    throw new InvalidOperationException("Configura ConnectionStrings__DefaultConnection antes de iniciar la aplicacion.");
+    throw new InvalidOperationException("Configure ConnectionStrings__DefaultConnection before starting the application.");
 }
 
-// Desde el IDE se usa el puerto publicado; dentro de Compose se usa el nombre del servicio.
+// Use the published port when running from the IDE; use the service name inside Compose.
 if (builder.Environment.IsDevelopment() &&
     !string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true", StringComparison.OrdinalIgnoreCase))
 {
@@ -111,8 +114,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var contextFactory = services.GetRequiredService<IDbContextFactory<FiyiStackDbContext>>();
 
-    int maxRetries = 5;       // Número máximo de intentos
-    int delayInSeconds = 5;  // Tiempo de espera entre intentos
+    int maxRetries = 5;       // Maximum number of attempts
+    int delayInSeconds = 5;  // Delay between attempts
 
     for (int retry = 1; retry <= maxRetries; retry++)
     {
@@ -120,24 +123,24 @@ using (var scope = app.Services.CreateScope())
         {
             using var context = contextFactory.CreateDbContext();
 
-            // Intenta aplicar las migraciones pendientes
+            // Try to apply pending migrations
             context.Database.Migrate();
 
-            // Si llega aquí, la migración fue exitosa. Salimos del bucle.
+            // Migration succeeded; exit the loop.
             break;
         }
         catch (Exception ex)
         {
             if (retry == maxRetries)
             {
-                // Si ya agotamos los intentos, lanzamos el error para que falle la app
+                // All attempts have been exhausted; throw an exception to stop the application.
                 throw new Exception("No se pudo conectar a SQL Server después de varios intentos.", ex);
             }
 
-            // Opcional: Puedes usar un Logger aquí en lugar de Console.WriteLine
+            // Optional: Use a logger here instead of Console.WriteLine
             Console.WriteLine($"[Intento {retry}/{maxRetries}] SQL Server no está listo todavía. Reintentando en {delayInSeconds} segundos...");
 
-            // Detiene la ejecución por unos segundos antes del siguiente intento
+            // Pause execution for a few seconds before the next attempt
             Thread.Sleep(TimeSpan.FromSeconds(delayInSeconds));
         }
     }
