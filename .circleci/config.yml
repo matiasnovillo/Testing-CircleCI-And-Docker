@@ -74,7 +74,7 @@ jobs:
       - run:
           name: Deploy via SSH to Azure VM
           command: |
-            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP << EOF
+            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP \<< EOF
               # 1. Autenticar la VM contra el ACR usando la identidad gestionada de la VM o credenciales temporales
               az login --identity || true # Si la VM tiene una Managed Identity asignada con rol AcrPull
               az acr login --name "$AZURE_ACR_NAME"
