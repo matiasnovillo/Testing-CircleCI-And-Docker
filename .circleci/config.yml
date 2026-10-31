@@ -74,23 +74,49 @@ jobs:
       - run:
           name: Deploy via SSH to Azure VM
           command: |
-            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP \<< EOF
-              # 1. Autenticar la VM contra el ACR usando la identidad gestionada de la VM o credenciales temporales
-              az login --identity || true # Si la VM tiene una Managed Identity asignada con rol AcrPull
-              az acr login --name "$AZURE_ACR_NAME"
+            : "${VM_USER:?Configura VM_USER en el contexto FiyiStackContext (ejemplo: fiyistack-su)}"
+            : "${VM_IP:?Configura VM_IP en el contexto FiyiStackContext (ejemplo: 52.154.75.2)}"
+            if [[ "$VM_USER" =~ [[:space:]@] || "$VM_IP" =~ [[:space:]@] || "$VM_USER" == -* || "$VM_IP" == -* ]]; then
+              echo "VM_USER debe contener solo el usuario y VM_IP solo la IP o el hostname, sin espacios ni @." >&2
+              exit 1
+            fi
+            : "${AZURE_ACR_NAME:?Configura AZURE_ACR_NAME en FiyiStackContext}"
+            ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no "${VM_USER}@${VM_IP}" 'bash -se' \<< EOF
+              set -euo pipefail
+              # Docker y la instalacion de Azure CLI requieren sudo sin contraseña.
+              sudo -n true
+              sudo -n docker info > /dev/null
+              if ! command -v az > /dev/null 2>&1; then
+                installer=\$(mktemp)
+                curl --fail --silent --show-error --location https://aka.ms/InstallAzureCLIDeb -o "\$installer"
+                sudo -n bash "\$installer"
+                rm -f "\$installer"
+              fi
+              # La VM debe tener identidad administrada con permiso de lectura en ACR.
+              az login --identity --output none
+              ACR_LOGIN_SERVER=\$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)
+              test -n "\$ACR_LOGIN_SERVER" && test "\$ACR_LOGIN_SERVER" != null
+              # Credenciales temporales en un directorio que se elimina al terminar.
+              DOCKER_CONFIG_DIR=\$(mktemp -d)
+              trap 'sudo -n rm -rf -- "\$DOCKER_CONFIG_DIR"' EXIT
+              az acr login --name "$AZURE_ACR_NAME" --expose-token --query accessToken --output tsv | \
+                sudo -n docker --config "\$DOCKER_CONFIG_DIR" login "\$ACR_LOGIN_SERVER" \
+                  --username 00000000-0000-0000-0000-000000000000 --password-stdin
               
               # 2. Bajar la nueva imagen
-              docker pull ${AZURE_ACR_NAME}.azurecr.io/fiyistack-app:${CIRCLE_SHA1}
+              sudo -n docker --config "\$DOCKER_CONFIG_DIR" pull "\$ACR_LOGIN_SERVER/fiyistack-app:${CIRCLE_SHA1}"
               
               # 3. Frenar el contenedor viejo y levantar el nuevo (o actualizar vía docker-compose)
-              docker stop fiyistack-container || true
-              docker rm fiyistack-container || true
+              if sudo -n docker container inspect fiyistack-container > /dev/null 2>&1; then
+                sudo -n docker stop fiyistack-container
+                sudo -n docker rm fiyistack-container
+              fi
               
-              docker run -d \
+              sudo -n docker run -d \
                 --name fiyistack-container \
                 -p 8080:8080 \
                 --restart unless-stopped \
-                ${AZURE_ACR_NAME}.azurecr.io/fiyistack-app:${CIRCLE_SHA1}
+                "\$ACR_LOGIN_SERVER/fiyistack-app:${CIRCLE_SHA1}"
             EOF
 
 workflows:
